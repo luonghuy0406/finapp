@@ -227,7 +227,7 @@ export default function AccountDetailScreen() {
             </View>
           )}
           
-          <FlatIconAttribution />
+          {/* <FlatIconAttribution /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

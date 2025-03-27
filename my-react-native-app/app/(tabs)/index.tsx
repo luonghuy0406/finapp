@@ -40,6 +40,32 @@ export default function DashboardScreen() {
   
   const netSavings = incomeTotal - expenseTotal;
 
+  const [activeTab, setActiveTab] = useState<"income" | "expense">("expense");
+
+  const calculateCategoryTotals = () => {
+    const categoryTotals: { [key: string]: number } = {};
+    periodTransactions
+      .filter(transaction => transaction.type === activeTab)
+      .forEach(transaction => {
+        if (!categoryTotals[transaction.categoryId]) {
+          categoryTotals[transaction.categoryId] = 0;
+        }
+        categoryTotals[transaction.categoryId] += transaction.amount * exchangeRates[selectedCurrency];
+      });
+    return categoryTotals;
+  };
+
+  const categoryTotals = calculateCategoryTotals();
+  const totalForType = activeTab === "income" ? incomeTotal : expenseTotal;
+
+  const sortedCategories = Object.entries(categoryTotals)
+    .sort(([, a], [, b]) => b - a)
+    .map(([categoryId, amount]) => ({
+      categoryId,
+      amount,
+      percentage: totalForType > 0 ? (amount / totalForType) * 100 : 0,
+    }));
+
   const periods: { label: string; value: Period }[] = [
     { label: t("day"), value: "day" },
     { label: t("week"), value: "week" },
@@ -141,7 +167,7 @@ export default function DashboardScreen() {
             </View>
           </View>
         </LinearGradient>
-
+        
         <View style={styles.periodSelector}>
           {periods.map((period) => (
             <TouchableOpacity
@@ -163,7 +189,7 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           ))}
         </View>
-
+        
         <View style={styles.statsCards}>
           <View style={[styles.statsCard, { backgroundColor: colors.secondaryLight }]}>
             <Text style={styles.statsTitle}>{t("netSavings")}</Text>
@@ -200,15 +226,82 @@ export default function DashboardScreen() {
               renderItem={renderTransaction}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
-              ListFooterComponent={<FlatIconAttribution />}
+              // ListFooterComponent={<FlatIconAttribution />}
             />
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateText}>{t("noTransactionsForPeriod")}</Text>
-              <FlatIconAttribution />
+              {/* <FlatIconAttribution /> */}
             </View>
           )}
         </View>
+        <View style={styles.tabSelector}>
+          <TouchableOpacity
+            style={[styles.tabButton, activeTab === "expense" && styles.activeTabButton]}
+            onPress={() => setActiveTab("expense")}
+          >
+            <ArrowDownRight size={18} color={activeTab === "expense" ? "#fff" : colors.gray} />
+            <Text style={[styles.tabButtonText, activeTab === "expense" && styles.activeTabButtonText]}>
+              {t("expenses")}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tabButton, activeTab === "income" && styles.activeTabButton]}
+            onPress={() => setActiveTab("income")}
+          >
+            <ArrowUpRight size={18} color={activeTab === "income" ? "#fff" : colors.gray} />
+            <Text style={[styles.tabButtonText, activeTab === "income" && styles.activeTabButtonText]}>
+              {t("income")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.categoriesSection}>
+          <Text style={styles.sectionTitle}>
+            {activeTab === "income" ? t("income") : t("expense")} {t("byCategory")}
+          </Text>
+          {sortedCategories.length > 0 ? (
+            sortedCategories.map(({ categoryId, amount, percentage }) => {
+              const category = getCategoryById(categoryId);
+              if (!category) return null;
+              return (
+                <View key={categoryId} style={styles.categoryItem}>
+                  <View style={styles.categoryHeader}>
+                    <View style={styles.categoryNameContainer}>
+                      <View style={[styles.categoryIcon, { backgroundColor: category.color }]}>
+                        <Image 
+                          source={{ uri: getCategoryIcon(categoryId, categories) }}
+                          style={styles.iconImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                      <Text style={styles.categoryName}>{category.name}</Text>
+                    </View>
+                    <View style={styles.categoryAmountContainer}>
+                      <Text style={styles.categoryAmount}>{formatCurrency(amount)}</Text>
+                      <Text style={styles.categoryPercentage}>{percentage.toFixed(1)}%</Text>
+                    </View>
+                  </View>
+                  <View style={styles.categoryProgressBar}>
+                    <View
+                      style={[
+                        styles.categoryProgressFill,
+                        { width: `${Math.max(0, Math.min(percentage, 100))}%`, backgroundColor: category.color },
+                      ]}
+                    />
+                  </View>
+                </View>
+              );
+            })
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>
+                {t(activeTab)} {t("noTransactionsForPeriod")}
+              </Text>
+            </View>
+          )}
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -308,13 +401,15 @@ const styles = StyleSheet.create({
   statsCards: {
     flexDirection: "row",
     paddingHorizontal: 20,
-    marginBottom: 24,
+    marginBottom: 14,
+    marginTop: 14
   },
   statsCard: {
     flex: 1,
     borderRadius: 16,
     padding: 16,
-    marginRight: 12,
+    marginRight: 6,
+    marginLeft: 6
   },
   statsTitle: {
     fontSize: typography.caption,
@@ -403,5 +498,90 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     color: colors.gray,
     marginBottom: 20,
+  },
+  tabSelector: {
+    flexDirection: "row",
+    marginHorizontal: 20,
+    marginBottom: 24,
+    borderRadius: 12,
+    backgroundColor: colors.cardBackground,
+    overflow: "hidden",
+  },
+  tabButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    marginHorizontal: 0,
+  },
+  activeTabButton: {
+    backgroundColor: colors.primary,
+  },
+  tabButtonText: {
+    fontSize: typography.body,
+    color: colors.gray,
+    fontWeight: "500",
+    marginLeft: 4,
+  },
+  activeTabButtonText: {
+    color: "#fff",
+  },
+  categoriesSection: {
+    marginHorizontal: 20,
+    marginBottom: 24,
+  },
+  categoryItem: {
+    marginBottom: 16,
+  },
+  categoryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  categoryNameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  categoryIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  iconImage: {
+    width: 18,
+    height: 18,
+    tintColor: "#fff",
+  },
+  categoryName: {
+    fontSize: typography.body,
+    color: colors.dark,
+  },
+  categoryAmountContainer: {
+    alignItems: "flex-end",
+  },
+  categoryAmount: {
+    fontSize: typography.body,
+    fontWeight: "600",
+    color: colors.dark,
+    marginBottom: 4,
+  },
+  categoryPercentage: {
+    fontSize: typography.small,
+    color: colors.gray,
+  },
+  categoryProgressBar: {
+    height: 8,
+    backgroundColor: colors.border,
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  categoryProgressFill: {
+    height: "100%",
+    borderRadius: 4,
   },
 });

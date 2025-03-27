@@ -260,7 +260,7 @@ export default function TransactionDetailScreen() {
             <Text style={styles.deleteButtonText}>Delete Transaction</Text>
           </TouchableOpacity>
           
-          <FlatIconAttribution />
+          {/* <FlatIconAttribution /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

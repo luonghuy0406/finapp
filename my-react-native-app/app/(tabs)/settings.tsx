@@ -230,7 +230,7 @@ export default function SettingsScreen() {
 
         <Text style={styles.versionText}>{t("version")} 1.0.0</Text>
         
-        <FlatIconAttribution />
+        {/* <FlatIconAttribution /> */}
       </ScrollView>
 
       {/* Language Selection Modal */}

@@ -82,7 +82,7 @@ export default function AccountsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.accountsList}
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={<FlatIconAttribution />}
+        // ListFooterComponent={<FlatIconAttribution />}
       />
     </SafeAreaView>
   );

@@ -63,7 +63,7 @@ export default function TabLayout() {
               style={{
                 width: size + 8,
                 height: size + 8,
-                tintColor: colors.background,
+                // tintColor: colors.background,
                 backgroundColor: colors.primary,
                 borderRadius: 50,
                 padding: 8,

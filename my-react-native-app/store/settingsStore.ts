@@ -64,6 +64,7 @@ export const useSettingsStore = create<SettingsState>()(
         { code: 'RUB', name: 'Russian Ruble' },
         { code: 'KRW', name: 'South Korean Won' },
         { code: 'MXN', name: 'Mexican Peso' },
+        { code: 'VND', name: 'Viet Nam Dong' },
       ],
       
       currencySymbols: {
@@ -82,6 +83,7 @@ export const useSettingsStore = create<SettingsState>()(
         'RUB': '₽',
         'KRW': '₩',
         'MXN': 'Mex$',
+        'VND': 'vnđ'
       },
       
       // Exchange rates relative to USD (1 USD = X of currency)
@@ -101,6 +103,7 @@ export const useSettingsStore = create<SettingsState>()(
         'RUB': 73.5,
         'KRW': 1150,
         'MXN': 20.1,
+        'VND': 25000
       },
     }),
     {

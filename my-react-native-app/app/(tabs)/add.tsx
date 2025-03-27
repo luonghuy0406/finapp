@@ -376,7 +376,7 @@ export default function AddTransactionScreen() {
             <Text style={styles.saveButtonText}>{t("saveTransaction")}</Text>
           </TouchableOpacity>
           
-          <FlatIconAttribution />
+          {/* <FlatIconAttribution /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

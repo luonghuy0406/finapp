@@ -155,7 +155,7 @@ export default function NewAccountScreen() {
             <Text style={styles.saveButtonText}>Create Account</Text>
           </TouchableOpacity>
           
-          <FlatIconAttribution />
+          {/* <FlatIconAttribution /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

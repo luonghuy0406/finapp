@@ -246,7 +246,7 @@ export default function TransactionsScreen() {
             </Text>
           </View>
         }
-        ListFooterComponent={<FlatIconAttribution />}
+        // ListFooterComponent={<FlatIconAttribution />}
       />
 
       {/* Filter Modal */}
